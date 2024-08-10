@@ -1,0 +1,256 @@
+<html>
+<head>
+<base href="https://www.example.com/ar/tv-stream/%20non%20je%20veux%20que%20mon%20Player%20fonctionne%20soit%20avec%20des%20url%20m3u8%20ou%20url%20YouTube">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المختصر في البث المباشر</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    direction: rtl;
+  }
+  .header {
+    background-color: #1a237e;
+    color: white;
+  }
+  .footer {
+    background-color: #303f9f;
+    color: white;
+  }
+  .playlist {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .channel-item {
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .channel-item:hover {
+    background-color: #e8eaf6;
+  }
+  .channel-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+  }
+  #videoPlayer {
+    background-color: #000;
+  }
+</style>
+</head>
+<body>
+
+<header class="header py-3 fixed-top">
+  <div class="container">
+    <h1 class="text-center">المختصر المفيد للقنوات الفضائية</h1>
+  </div>
+</header>
+
+<main class="container mt-5 pt-5">
+  <div class="row">
+    <div class="col-lg-8">
+      <div id="videoPlayer" class="ratio ratio-16x9 mb-3">
+        <!-- سيتم إضافة الفيديو أو الإطار هنا ديناميكيًا -->
+      </div>
+      <div id="channelInfo" class="d-flex align-items-center mb-3">
+        <img id="currentLogo" src="" alt="شعار القناة" class="me-2 channel-logo">
+        <h3 id="currentChannel">اختر قناة للمشاهدة</h3>
+      </div>
+      <div id="alertMessage" class="alert alert-danger d-none" role="alert">
+        عذراً، هذه القناة غير متوفرة حالياً
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="mb-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="ابحث عن قناة...">
+      </div>
+      <div class="mb-3 d-flex">
+        <select class="form-select me-2" id="categoryFilter">
+          <option value="">كل الفئات</option>
+        </select>
+        <select class="form-select" id="countryFilter">
+          <option value="">كل الدول</option>
+        </select>
+      </div>
+      <div class="playlist list-group">
+        <!-- القنوات ستضاف هنا ديناميكياً -->
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer py-3 mt-5">
+  <div class="container text-center">
+    <p>جميع الحقوق محفوظة © 2023 منصة بث التلفزيون العربي</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const channels = [
+   // دينية 
+   { name: "قناة السنة النبوية ", logo: "https://yt3.googleusercontent.com/ytc/AIdro_mQEOSPf6okcuPezKOKSfhc6kKQxF1q57i2SsTOazhCg2s=s160-c-k-c0x00ffffff-no-rj", category: "السنة النبوية", country: "السعودية", url: "https://win.holol.com/live/sunnah/chunklist.m3u8" },
+  { name: "قناة القران الكريم", logo: "https://yt3.googleusercontent.com/ytc/AIdro_mesiGG76gww2WnpFVUFbMz-s2d4IjJJVhDqJuCVscqKLY=s160-c-k-c0x00ffffff-no-rj", category: "القرآن الكريم", country: "السعودية", url: "https://al-ekhbaria-prod-dub.shahid.net/out/v1/9885cab0a3ec4008b53bae57a27ca76b/index_1.m3u8" },
+  { name: "قناة البحرين للقرآن", logo: "https://dawa.center/images/626c5f0890dff.png", category: "القرآن الكريم", country: "البحرين", url: "https://5c7b683162943.streamlock.net/live/ngrp:bahrainquran_all/chunklist_w939106958_b978000.m3u8" },
+  { name: "قناة صاد", logo: "https://www.ssad.tv/uploads/Launching-a-new-identity.jpg", category: "القرآن الكريم", country: "السعودية", url: "https://www.enterweb.tv:25463/live/ssadtv/live-tv/1.m3u8" },
+  { name: "قناة مكة", logo: "https://makkahtv.tv/assets/images/makkah-channel-redcolor-1440-alpha-570x716.png", category: "دينية", country: "السعودية", url: "https://media2.streambrothers.com:1936/8122/8122/chunklist_w1885647965.m3u8" },
+  { name: "قناة العفاسي للقران الكريم", logo: "https://yt3.googleusercontent.com/hGGa_FSduoqGTVsmz4h6CiG_uKcodX1_mIk6xJ8h6mg--0_NYaKMx1FqjGAKToBuTYrsUBu_4w=s160-c-k-c0x00ffffff-no-rj", category: "القرآن الكريم", country: "الكويت", url: "https://www.youtube.com/watch?v=NdagXc_-nHg" },
+  { name: "قناة اثراء الكويتية", logo: "https://dawa.center/images/61c76de015c2d.jpg", category: "دينية", country: "الكويت", url: "https://kwtethta.cdn.mangomolo.com/eth/smil:eth.stream.smil/chunklist_b3500000_t64MTA4MHA=.m3u8" },
+  { name: "قناة اقرأ ", logo: "https://yt3.googleusercontent.com/DDkLFc2B4nibp7L_h4fmFC052GcCNzvskPpz6ACpxanS1N2NYxndYb_VyhNS3uXb1zIilV25=s900-c-k-c0x00ffffff-no-rj", category: "دينية", country: "السعودية", url: "https://iqraa-live.ercdn.net/iqraa/iqraa_576p.m3u8" },
+  { name: " قناة الاستقامة", logo: "https://www.istiqama.tv/wp-content/uploads/2024/05/cropped-Channel-Logo-2024-120x39.png", category: "دينية", country: "سلطنة عمان", url: "https://jmc-live.ercdn.net/alistiqama/alistiqama_576p.m3u8" },
+
+  // الإخبارية
+  { name: "الجزيرة", logo: "https://network.aljazeera.net/themes/custom/partner/logo.svg", category: "إخبارية", country: "قطر", url: "https://live-hls-web-aja.getaj.net/AJA/index.m3u8" },
+  { name: "الجزيرة", logo: "https://network.aljazeera.net/themes/custom/partner/logo.svg", category: "إخبارية", country: "قطر", url: "https://live-hls-web-aja-fa.getaj.net/AJA/05.m3u8" },
+  { name: "الجزيرة مباشر", logo: "https://ar.ra2ya.com/wp-content/uploads/2021/06/88052650_3458986697447373_4374408050488901632_n.png", category: "إخبارية", country: "قطر", url: "https://live-hls-web-ajm.getaj.net/AJM/02.m3u8" },
+  { name: "قناة المملكة", logo: "https://www.almamlakatv.com/images/articles/big/default.jpg", category: "إخبارية", country: "الأردن", url: "https://bcovlive-a.akamaihd.net/4109c7ba30fd4a44ad9afe917c67a8c8/eu-central-1/6415809151001/profile_0/chunklist_dvr.m3u8" },
+  { name: "سكاي نيوز عربية ", logo: "https://www.skynewsarabia.com/asset/1643203809/17.1/assets/img/sna_logo/header_logo_color.svg", category: "إخبارية", country: "دولية", url: "https://stream.skynewsarabia.com/hls/sna_720.m3u8" },
+  { name: "تلفزيون فلسطين", logo: "https://i0.wp.com/www.pbc.ps/wp-content/uploads/2021/09/%D9%82%D9%86%D8%A7%D8%A9-%D9%81%D9%84%D8%B3%D8%B7%D9%8A%D9%86-%D9%85%D8%A8%D8%A7%D8%B4%D8%B1.webp?resize=300%2C300&ssl=1", category: "إعلامية", country: "فلسطين", url: "https://pbc.furrera.ps/palestinehd/tracks-v2a1/mono.m3u8" },
+  { name: "فلسطين اليوم", logo: "https://paltodaytv.com/style/assets/images/logo.png", category: "إخبارية", country: "فلسطين", url: "https://live.paltodaytv.com/paltv/live/chunklist.m3u8" },
+  { name: "قناة الميادين", logo: "https://www.almayadeen.net/Mdn2023/images/darklogo.svg?v=3", category: "إخبارية", country: "لبنان", url: "https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/chunklist_b400000_t64MjQwcA==.m3u8" },
+  { name: "التلفزيون العربي", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu3zxlMf6T7tdVqq5ruRv0uKFlduof9M1iZA&s", category: "إخبارية", country: "قطر", url: "https://alarabyta.cdn.octivid.com/alaraby/smil:alaraby.stream.smil/chunklist_b1150000.m3u8" },
+  { name: "قناة العراقية الاخبارية", logo: "https://imn.iq/wp-content/uploads/2022/09/55.jpg", category: "إخبارية", country: "العراق", url: "https://cdn.catiacast.video/abr/78054972db7708422595bc96c6e024ac/imn/news1/chunks.m3u8" },
+  { name: "قناة الغد", logo: "https://www.alghad.tv/wp-content/uploads/2023/10/logo.png", category: "إخبارية", country: "مصر", url: "https://www.youtube.com/watch?v=hNfDJk4LYiM" },
+  { name: " فرانس 24  مباشرةعلى اليوتوب", logo: "https://www.francemediasmonde.com/en/wp-content/themes/fmm/images/logos-small/logo-france24.svg", category: "إخبارية", country: "فرنسا", url: "https://www.youtube.com/watch?v=VuYzy8IuT0Y" },
+  { name: "Africanews TV en direct", logo: "https://yt3.googleusercontent.com/ytc/AIdro_nPCPPLjp-33-ae31fQNCUONzD_xU9OYLH0GCbz28e8dco=s160-c-k-c0x00ffffff-no-rj", category: "إخبارية", country: "فرنسا", url: "https://www.youtube.com/watch?v=b6R9-7KZ8YM" },
+  { name: "FRANCE 24 – EN DIRECT", logo: "https://www.francemediasmonde.com/en/wp-content/themes/fmm/images/logos-small/logo-france24.svg", category: "إخبارية", country: "فرنسا", url: "https://www.youtube.com/watch?v=l8PMl7tUDIE" },
+  { name: "BBC News عربي Live Stream", logo: "data:image/jpeg;base64,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", category: "إخبارية", country: "بريطانيا", url: "https://www.youtube.com/watch?v=dsivequqb-Q" },
+  { name: "النيل الإخبارية", logo: "https://www.nile.eg/wp-content/themes/nileeg/images/icon.png", category: "إخبارية", country: "مصر", url: "https://live-b.cf.dmcdn.net/sec2(ulbqfXEfNjI-1zIPN7Hw-xTKD2H5M7o-U3xh59qKAMK8oHWTQmB1sLJM0cAmftlQqjATP3JT4c9571bIEurMtfyhvr8m8ECGNrScSSerUDg)/dm/3/x84nwne/s/live-480.m3u8" },
+  //  إعلامية
+  { name: "روسيا اليوم", logo: "https://ar.russiatoday.com/static/projects/assets/img/logo-main.svg", category: "إعلامية", country: "روسيا", url: "https://rt-arb.rttv.com/dvr/rtarab/playlist_1600Kb.m3u8" },
+  { name: "قناة قدسنا", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLtnfXWQLBEtT-H8i3H-8Dzcv7ZzroBKS39A&s", category: "إعلامية", country: "فلسطين", url: "https://qudsunatv-live.cdnnew.com/qudsunatv/qudsunatv_higher.m3u8" },
+  { name: "قناة الاقصى الفلسطينية", logo: "https://www.web24iptv.online/img/filistin/filaqsa.webp", category: "إعلامية", country: "فلسطين", url: "http://95.216.180.111:1935/live/68/chunklist_w1693422640.m3u8" },
+  { name: "CNBC عربية على اليوتوب", logo: "https://www.cnbcarabia.com/_next/static/media/NewCNCBLogo.c428648c.svg", category: "إعلامية", country: "بريطانيا", url: "https://www.youtube.com/watch?v=I-qP4xS7vPg" },
+  { name: "قناة الحوار", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7aAUS1RpPd5s9nbPm3JgOF_qbEB5Ru80Pjw&s", category: "إعلامية", country: "دولية", url: "https://mn-nl.mncdn.com/alhiwar_live/smil:alhiwar.smil/chunklist_b3128000.m3u8" },
+
+  { name: "قناة طيبة", logo: "data:image/jpeg;base64,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", category: "عامة", country: "السودان", url: "https://mn-nl.mncdn.com/tayba/live/chunklist.m3u8" },
+  { name: "الصين بالعربي", logo: "https://upload.wikimedia.org/wikipedia/commons/9/97/CGTN_arabic.png", category: "عامة", country: "الصين", url: "https://livear.cgtn.com/1000a/prog_index.m3u8" },
+  { name: "الألمانية العربية", logo: "https://i.ytimg.com/vi/mVhb_Qnc1ME/hq720_live.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCjUkjInvEvDVkuav5Krp2iSEnl0Q", category: "عامة", country: "ألمانيا", url: "https://dwamdstream103.akamaized.net/hls/live/2015526/dwstream103/stream04/streamPlaylist.m3u8" },
+  { name: "Medi 1 TV Arabic", logo: "https://img.medi1tv.com/vis_live_Medi1V_arabic.jpg", category: "عامة", country: "المغرب", url: "https://streaming1.medi1tv.com/live/smil:medi1ar.smil/chunklist_w486242450_b2256000_slar.m3u8" },
+  { name: "فلسطيني", logo: "https://yt3.googleusercontent.com/0LWDyVIMqL_-xmh3PMd2OZcXc2i4ZrJXJocRRu_Y8OJzYpyhJzIw08qmZvmEzvjDnhEcqs-Iwg=s160-c-k-c0x00ffffff-no-rj", category: "عامة", country: "تركيا", url: "https://rp.tactivemedia.com/falastinitv/live/chunks.m3u8?nimblesessionid=11998205" },
+  { name: "Syria TV", logo: "https://upload.wikimedia.org/wikipedia/ar/thumb/6/69/%D8%B4%D8%B9%D8%A7%D8%B1_%D8%AA%D9%84%D9%81%D8%B2%D9%8A%D9%88%D9%86_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7.svg/800px-%D8%B4%D8%B9%D8%A7%D8%B1_%D8%AA%D9%84%D9%81%D8%B2%D9%8A%D9%88%D9%86_%D8%B3%D9%88%D8%B1%D9%8A%D8%A7.svg.png", category: "عامة", country: "تركيا", url: "https://svs.itworkscdn.net/syriatvlive/syriatv.smil/syriatvpublish/syriatv_source/chunks_dvr.m3u8" },
+  { name: "قناة تركيا بالعربي", logo: "https://www.web24iptv.online/img/newsAR/newsARtrt.webp", category: "عامة", country: "تركيا", url: "https://tv-trtarabi.medya.trt.com.tr/master_1080.m3u8" },
+  { name: "Musawa", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Musawachannel.png/800px-Musawachannel.png", category: "عامة", country: "فلسطين", url: "https://pbc.furrera.ps/musawahd/tracks-v2a1/mono.m3u8" },
+  { name: "Palestine Mobasher ", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzWenmqgtjZvawYVG0M8wcMSB4GXeJly2llg&s", category: "عامة", country: "فلسطين", url: "https://pbc.furrera.ps/palestinehd/tracks-v3a1/mono.m3u8" },
+  { name: "قناة راجعين الفلسطينية ", logo: "https://yt3.googleusercontent.com/HonwBShHABUWntjbIiEYqk6c1FcgIXnTQUTYkqZpJdJ2f05xRur-9UuH0A84y05qk2umVAoI=s900-c-k-c0x00ffffff-no-rj", category: "عامة", country: "فلسطين", url: "https://mn-nl.mncdn.com/palabroad/live/chunklist.m3u8" },
+  { name: "تلفزيون العربي 2", logo: "https://yt3.googleusercontent.com/PJ90g5mh_Xli3uSX9giShyGSZ0G9LdmlJMbZk6lR-0og-eqyuUROr8Povd5wcKHzScRu9RSi8nw=s900-c-k-c0x00ffffff-no-rj", category: "عامة", country: "قطر", url: "https://alarabyta.cdn.octivid.com/alaraby2n/smil:alaraby2n.stream.smil/chunklist_b1150000.m3u8" },
+  { name: "الجزيرة الوثائقية", logo: "https://e7.pngegg.com/pngimages/762/955/png-clipart-al-jazeera-documentary-channel-doha-aljazeera-international-documentary-film-festival-others-television-text.png", category: "وثائقية", country: "قطر", url: "https://live-hls-web-ajd.getaj.net/AJD/03.m3u8" },
+
+
+
+  
+  
+  { name: "قناة يوتيوب", logo: "https://example.com/youtube-logo.png", category: "متنوع", country: "عالمي", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+  // أضف المزيد من القنوات هنا
+];
+
+const videoPlayer = document.getElementById('videoPlayer');
+const playlist = document.querySelector('.playlist');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const countryFilter = document.getElementById('countryFilter');
+const currentLogo = document.getElementById('currentLogo');
+const currentChannel = document.getElementById('currentChannel');
+const alertMessage = document.getElementById('alertMessage');
+
+function loadChannel(channel) {
+  if (channel.url.includes('youtube.com')) {
+    // تحميل فيديو يوتيوب
+    const videoId = channel.url.split('v=')[1];
+    videoPlayer.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  } else {
+    // تحميل م3و8
+    videoPlayer.innerHTML = '<video id="hlsVideo" controls class="w-100 h-100"></video>';
+    const video = document.getElementById('hlsVideo');
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(channel.url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        video.play();
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = channel.url;
+      video.addEventListener('loadedmetadata', function() {
+        video.play();
+      });
+    }
+  }
+  currentLogo.src = channel.logo;
+  currentLogo.alt = `شعار ${channel.name}`;
+  currentChannel.textContent = channel.name;
+  alertMessage.classList.add('d-none');
+}
+
+function createChannelItem(channel) {
+  const item = document.createElement('div');
+  item.className = 'channel-item list-group-item list-group-item-action d-flex align-items-center';
+  item.innerHTML = `
+    <img src="${channel.logo}" alt="${channel.name}" class="me-2 channel-logo">
+    <div>
+      <h5 class="mb-1">${channel.name}</h5>
+      <small>${channel.category} - ${channel.country}</small>
+    </div>
+  `;
+  item.addEventListener('click', () => loadChannel(channel));
+  return item;
+}
+
+function renderChannels(filteredChannels) {
+  playlist.innerHTML = '';
+  filteredChannels.forEach(channel => {
+    playlist.appendChild(createChannelItem(channel));
+  });
+}
+
+function filterChannels() {
+  const searchTerm = searchInput.value.toLowerCase();
+  const categoryValue = categoryFilter.value;
+  const countryValue = countryFilter.value;
+  
+  const filteredChannels = channels.filter(channel => 
+    channel.name.toLowerCase().includes(searchTerm) &&
+    (categoryValue === '' || channel.category === categoryValue) &&
+    (countryValue === '' || channel.country === countryValue)
+  );
+  
+  renderChannels(filteredChannels);
+}
+
+function populateFilters() {
+  const categories = [...new Set(channels.map(channel => channel.category))];
+  const countries = [...new Set(channels.map(channel => channel.country))];
+  
+  categories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+  
+  countries.forEach(country => {
+    const option = document.createElement('option');
+    option.value = country;
+    option.textContent = country;
+    countryFilter.appendChild(option);
+  });
+}
+
+searchInput.addEventListener('input', filterChannels);
+categoryFilter.addEventListener('change', filterChannels);
+countryFilter.addEventListener('change', filterChannels);
+
+window.addEventListener('error', (e) => {
+  if (e.target.tagName === 'VIDEO' || e.target.tagName === 'IFRAME') {
+    alertMessage.classList.remove('d-none');
+  }
+}, true);
+
+populateFilters();
+renderChannels(channels);
+</script>
+</body>
+</html>
